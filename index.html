@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NotGaboo SMP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Minecraft font -->
+<style>
+@font-face {
+    font-family: 'Minecraft';
+    src: url('Minecraft.ttf') format('truetype'); /* cseréld a saját TTF fájlodra */
+}
+
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Minecraft', Arial, sans-serif; color:white; }
+#bgVideo { position:fixed; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:-1; filter: blur(4px) brightness(0.6); }
+.container { backdrop-filter: blur(15px); background:rgba(0,0,0,0.5); min-height:100vh; padding:40px; text-align:center; display:flex; flex-direction:column; align-items:center; }
+.logo { width:66%; max-width:400px; height:auto; margin-bottom:20px; }
+#serverIP, #playerCount { font-size:20px; margin-top:10px; color:#00ffcc; }
+.panel { background: rgba(255,255,255,0.08); padding:20px; border-radius:15px; margin:20px auto; width:90%; max-width:350px; backdrop-filter: blur(10px); }
+button { padding:10px 20px; border:none; border-radius:8px; background:#00ffcc; color:black; font-weight:bold; cursor:pointer; margin-top:8px; }
+button:hover { background:white; }
+input { padding:8px; width:90%; border-radius:6px; border:none; margin:5px 0; }
+a { color:#ffffff; text-decoration:underline; }
+footer { margin-top:40px; font-size:14px; opacity:0.7; }
+.glaze { margin-top:10px; font-size:18px; color:#00ffcc; letter-spacing:1px; line-height:1.6; text-align:center; }
+</style>
+</head>
+
+<body>
+
+<!-- BACKGROUND VIDEO -->
+<video autoplay muted loop id="bgVideo">
+  <source src="background.mp4" type="video/mp4">
+</video>
+
+<div class="container">
+
+<!-- LOGO -->
+<img src="logo.png" alt="NotGaboo SMP Logo" class="logo">
+
+<!-- SERVER INFO -->
+<p id="serverIP">IP: NotGaboo.aternos.me:53327</p>
+<div id="playerCount">Loading players...</div>
+<p class="glaze">
+  🔥 Unique SMP Experience<br>
+  🌍 Active Community<br>
+  🚀 Always Updated
+</p>
+
+<!-- LOGIN PANEL -->
+<div class="panel" id="loginPanel">
+  <h2>Login</h2>
+  <input id="loginUsername" placeholder="Username"><br>
+  <input type="password" id="loginPassword" placeholder="Password"><br>
+  <input type="checkbox" id="showLoginPassword"> Show Password<br>
+  <button onclick="loginUser()">Login</button>
+  <p style="font-size:14px; color:#00ffcc;">
+    Don't have an account? 
+    <a href="#" onclick="showRegister()">Register Now</a>
+  </p>
+</div>
+
+<!-- REGISTER PANEL -->
+<div class="panel" id="registerPanel" style="display:none;">
+  <h2>Register</h2>
+  <input id="regUsername" placeholder="Username"><br>
+  <input id="regEmail" placeholder="Email (optional)"><br>
+  <input type="password" id="regPassword1" placeholder="Password"><br>
+  <input type="password" id="regPassword2" placeholder="Confirm Password"><br>
+  <input type="checkbox" id="showRegPassword"> Show Password<br>
+  <button onclick="registerUser()">Register</button>
+  <p style="font-size:14px; color:#00ffcc;">
+    Already have an account? 
+    <a href="#" onclick="showLogin()">Login</a>
+  </p>
+</div>
+
+<!-- DISCORD PANEL -->
+<div class="panel">
+  <h2>Discord</h2>
+  <button onclick="window.open('https://discord.gg/UT4VgtZAF')">Join Discord</button>
+</div>
+
+<footer>NotGaboo SMP • 2026</footer>
+
+</div>
+
+<script>
+// ===== LIVE PLAYER COUNTER =====
+async function getPlayers() {
+  try {
+    let res = await fetch("https://api.mcsrvstat.us/2/NotGaboo.aternos.me:53327");
+    let data = await res.json();
+    if (data.online) {
+      document.getElementById("playerCount").innerHTML =
+        `Players Online: ${data.players.online}/${data.players.max}`;
+    } else {
+      document.getElementById("playerCount").innerHTML = "Server Offline";
+    }
+  } catch {
+    document.getElementById("playerCount").innerHTML = "API Error";
+  }
+}
+getPlayers();
+setInterval(getPlayers, 5000);
+
+// ===== LOGIN / REGISTER PANEL TOGGLE =====
+function showRegister(){ document.getElementById('loginPanel').style.display='none'; document.getElementById('registerPanel').style.display='block'; }
+function showLogin(){ document.getElementById('registerPanel').style.display='none'; document.getElementById('loginPanel').style.display='block'; }
+
+// ===== SHOW PASSWORD =====
+document.getElementById('showLoginPassword').addEventListener('change', function(){
+  document.getElementById('loginPassword').type = this.checked ? 'text':'password';
+});
+document.getElementById('showRegPassword').addEventListener('change', function(){
+  document.getElementById('regPassword1').type = this.checked ? 'text':'password';
+  document.getElementById('regPassword2').type = this.checked ? 'text':'password';
+});
+
+// ===== REGISTER FUNCTION (DEMO) =====
+function registerUser(){
+  const username = document.getElementById('regUsername').value;
+  const email = document.getElementById('regEmail').value;
+  const pass1 = document.getElementById('regPassword1').value;
+  const pass2 = document.getElementById('regPassword2').value;
+
+  if(!username || !pass1 || !pass2){ alert("Please fill in all required fields."); return; }
+  if(pass1 !== pass2){ alert("Passwords do not match!"); return; }
+
+  alert("Registration successful! (Demo mode, no email sent)");
+  showLogin();
+}
+
+// ===== LOGIN DEMO =====
+function loginUser(){
+  const username = document.getElementById('loginUsername').value;
+  const password = document.getElementById('loginPassword').value;
+  if(!username || !password){ alert("Please enter username and password!"); return; }
+  alert("Welcome back, "+username+"!");
+}
+</script>
+
+</body>
+</html>
